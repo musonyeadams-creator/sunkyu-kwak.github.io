@@ -28,6 +28,10 @@ input,textarea{width:100%;padding:10px;margin:4px 0 14px;border:1px solid var(--
 footer{text-align:center;padding:40px 20px;color:var(--mu);font:14px system-ui,sans-serif}
 .todo{border-style:dashed}
 @media print{nav,footer,section:not(#resume){display:none}}
+.card p.body{white-space:pre-wrap}
+.sec{background:transparent;color:var(--tx);border:1px solid var(--ln)}
+#editor .card{margin-bottom:14px}
+#editor button{margin:0 8px 8px 0}
 </style></head><body>
 <nav><b>Sunkyu Kwak</b><a href="#home">Home</a><a href="#coursework">Coursework</a><a href="#showcase">Showcase</a><a href="#blog">Blog</a><a href="#resume">Resume</a><a href="#references">References</a><a href="#contact">Contact</a></nav>
 
@@ -53,13 +57,8 @@ footer{text-align:center;padding:40px 20px;color:var(--mu);font:14px system-ui,s
 <!-- COURSEWORK -->
 <section id="coursework">
 <h2>Coursework</h2>
-<p>My RPTM courses help me connect classroom learning to the skills I used in my internships, such as coordination, communication, and organized planning. Add a short description and a takeaway for each course below.</p>
-<div class="grid">
-<div class="card"><h3>RPTM 101</h3><p class="mu">Current course</p><p><b>What I am learning:</b> <em>Add a short course description here.</em></p><p><b>Connection to my goals:</b> <em>Explain how it supports your career interests.</em></p></div>
-<div class="card"><h3>RPTM 394</h3><p class="mu">Current course</p><p><b>What I am learning:</b> <em>Add a short course description here.</em></p><p><b>Connection to my goals:</b> <em>Explain how it supports your career interests.</em></p></div>
-<div class="card"><h3>RPTM 456</h3><p class="mu">Current course</p><p><b>What I am learning:</b> <em>Add a short course description here.</em></p><p><b>Connection to my goals:</b> <em>Explain how it supports your career interests.</em></p></div>
-<div class="card todo"><h3>+ Add another course</h3><p class="mu">Copy one of the cards above in the page code and change the text.</p></div>
-</div></section>
+<p>My RPTM courses help me connect classroom learning to the skills I used in my internships, such as coordination, communication, and organized planning.</p>
+<div class="grid" id="courses"></div></section>
 
 <!-- SHOWCASE -->
 <section id="showcase">
@@ -84,11 +83,9 @@ footer{text-align:center;padding:40px 20px;color:var(--mu);font:14px system-ui,s
 <section id="blog">
 <h2>Blog &amp; Self-Reflection</h2>
 <p class="mu">Reflections on my academic experience, professional development, and career preparation.</p>
-<div class="grid">
-<article class="card"><p class="mu" style="margin:0">Post 1 &middot; Date</p><h3>Reflection Title 1</h3><p><em>Write your first reflection here.</em></p></article>
-<article class="card"><p class="mu" style="margin:0">Post 2 &middot; Date</p><h3>Reflection Title 2</h3><p><em>Write your second reflection here.</em></p></article>
-<article class="card"><p class="mu" style="margin:0">Post 3 &middot; Date</p><h3>Reflection Title 3</h3><p><em>Write your third reflection here.</em></p></article>
-</div></section>
+<div class="grid" id="posts"></div></section>
+
+<section id="editor" hidden></section>
 
 <!-- RESUME -->
 <section id="resume">
@@ -134,5 +131,88 @@ function send(){var n=document.getElementById('n').value,e=document.getElementBy
 if(!n||!e||!m){document.getElementById('s').textContent='Please fill in all fields.';return}
 location.href='mailto:telonkwak7@gmail.com?subject='+encodeURIComponent('Portfolio message from '+n)+'&body='+encodeURIComponent(m+'\n\nReply to: '+e);
 document.getElementById('s').textContent='Opening your email app to send the message.'}
+</script>
+<script id="site-data" type="application/json">
+{
+ "courses": [
+  {
+   "code": "RPTM 101",
+   "status": "Current course",
+   "learning": "Add a short course description here.",
+   "connection": "Explain how this course supports your career interests."
+  },
+  {
+   "code": "RPTM 394",
+   "status": "Current course",
+   "learning": "Add a short course description here.",
+   "connection": "Explain how this course supports your career interests."
+  },
+  {
+   "code": "RPTM 456",
+   "status": "Current course",
+   "learning": "Add a short course description here.",
+   "connection": "Explain how this course supports your career interests."
+  }
+ ],
+ "posts": [
+  {
+   "date": "Date",
+   "title": "Reflection Title 1",
+   "body": "Write your first reflection here."
+  },
+  {
+   "date": "Date",
+   "title": "Reflection Title 2",
+   "body": "Write your second reflection here."
+  },
+  {
+   "date": "Date",
+   "title": "Reflection Title 3",
+   "body": "Write your third reflection here."
+  }
+ ]
+}
+</script>
+<script>
+(function(){
+var D=JSON.parse(document.getElementById('site-data').textContent);
+var EDIT=/[?&]edit/.test(location.search);
+if(EDIT){try{var sv=localStorage.getItem('portfolio-draft');if(sv)D=JSON.parse(sv)}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+function esc(t){var d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML}
+function ea(t){return esc(t).replace(/"/g,'&quot;')}
+function render(){
+ $('courses').innerHTML=D.courses.map(function(c){return '<div class="card"><h3>'+esc(c.code)+'</h3><p class="mu">'+esc(c.status)+'</p><p><b>What I am learning:</b> '+esc(c.learning)+'</p><p><b>Connection to my goals:</b> '+esc(c.connection)+'</p></div>'}).join('');
+ $('posts').innerHTML=D.posts.map(function(p){return '<article class="card"><p class="mu" style="margin:0">'+esc(p.date)+'</p><h3>'+esc(p.title)+'</h3><p class="body">'+esc(p.body)+'</p></article>'}).join('');
+}
+function inp(k,i,f,label,v){return '<label>'+label+'</label><input data-k="'+k+'" data-i="'+i+'" data-f="'+f+'" value="'+ea(v)+'">'}
+function ta(k,i,f,label,v,r){return '<label>'+label+'</label><textarea rows="'+r+'" data-k="'+k+'" data-i="'+i+'" data-f="'+f+'">'+esc(v)+'</textarea>'}
+function buildEditor(){
+ var h='<h2>Edit Mode</h2><p class="mu">Changes show on this page right away. To publish them, click "Download index.html" and upload that file to your GitHub repository (replace the old index.html).</p><h3>Courses</h3>';
+ D.courses.forEach(function(c,i){h+='<div class="card">'+inp('courses',i,'code','Course',c.code)+inp('courses',i,'status','Label (for example, Current course or Completed)',c.status)+ta('courses',i,'learning','What I am learning',c.learning,3)+ta('courses',i,'connection','Connection to my goals',c.connection,3)+'<button class="sec" data-del="courses" data-i="'+i+'">Delete course</button></div>'});
+ h+='<button data-add="courses">+ Add course</button><h3 style="margin-top:20px">Reflection posts</h3>';
+ D.posts.forEach(function(p,i){h+='<div class="card">'+inp('posts',i,'date','Date',p.date)+inp('posts',i,'title','Title',p.title)+ta('posts',i,'body','Reflection',p.body,8)+'<button class="sec" data-del="posts" data-i="'+i+'">Delete post</button></div>'});
+ h+='<button data-add="posts">+ Add post</button><hr><button data-act="save">Save draft in this browser</button><button data-act="dl">Download index.html</button><p class="mu" id="msg"></p>';
+ $('editor').innerHTML=h;
+}
+function download(){
+ var c=document.documentElement.cloneNode(true);
+ c.querySelector('#courses').innerHTML='';c.querySelector('#posts').innerHTML='';
+ var e=c.querySelector('#editor');e.innerHTML='';e.setAttribute('hidden','');
+ c.querySelector('#site-data').textContent='\n'+JSON.stringify(D,null,1).replace(/</g,'\\u003c')+'\n';
+ var b=new Blob(['<!DOCTYPE html>\n'+c.outerHTML],{type:'text/html'});
+ var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='index.html';document.body.appendChild(a);a.click();a.remove();
+}
+render();
+if(EDIT){
+ var ed=$('editor');ed.hidden=false;buildEditor();
+ ed.addEventListener('input',function(e){var t=e.target.dataset;if(t.k){D[t.k][t.i][t.f]=e.target.value;render()}});
+ ed.addEventListener('click',function(e){var t=e.target.dataset;
+  if(t.del){D[t.del].splice(+t.i,1);render();buildEditor()}
+  else if(t.add){D[t.add].push(t.add==='courses'?{code:'RPTM ###',status:'Current course',learning:'',connection:''}:{date:'Date',title:'New reflection',body:''});render();buildEditor()}
+  else if(t.act==='save'){try{localStorage.setItem('portfolio-draft',JSON.stringify(D));$('msg').textContent='Draft saved in this browser.'}catch(x){$('msg').textContent='Could not save a draft here.'}}
+  else if(t.act==='dl'){download()}});
+}
+})();
 </script>
 </body></html>
